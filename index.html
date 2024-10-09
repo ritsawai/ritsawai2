@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องคำนวณสัดส่วนฝูงโคนม</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #27ae60;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #333333;
+        }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: var(--card-background);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background-color: var(--card-background);
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: var(--card-background);
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2ecc71;
+        }
+        #results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            display: none;
+        }
+        #results h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        .recommendation {
+            background-color: #d5f5e3;
+            border-left: 5px solid var(--secondary-color);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        .contact-info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8f6f3;
+            border-radius: 8px;
+            text-align: center;
+            font-style: italic;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            th, td {
+                padding: 8px;
+            }
+            input[type="number"] {
+                width: 60px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>เครื่องคำนวณสัดส่วนฝูงโคนม</h1>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ระยะการผลิต</th>
+                        <th>จำนวน (ตัว)</th>
+                        <th>ร้อยละ (%)</th>
+                        <th>เป้าหมายมาตรฐาน (%)</th>
+                        <th>จำนวนตามเป้าหมาย (ตัว)</th>
+                        <th>ควรเพิ่ม/ลด</th>
+                    </tr>
+                </thead>
+                <tbody id="cowTable">
+                    <!-- จะถูกเติมด้วย JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <button onclick="calculate()">คำนวณและแสดงผล</button>
+        <div id="results">
+            <h2>ผลการวิเคราะห์</h2>
+            <div id="analysis"></div>
+            <div class="recommendation">
+                <h3>คำแนะนำ</h3>
+                <div id="recommendations"></div>
+            </div>
+        </div>
+        <div class="contact-info">
+            สำหรับข้อมูลเพิ่มเติม กรุณาติดต่อ: แผนกวิชาการโคนม ฝ่ายวิจัยและพัฒนาการเลี้ยงโคนม<br>
+            อีเมล: <a href="mailto:dairyresearch@dpo.go.th">dairyresearch@dpo.go.th</a>
+        </div>
+    </div>
+
+    <script>
+        const cowData = [
+            { key: 'lactating', name: 'แม่โครีดนม (ทุกระยะ)', count: 15, target: 50 },
+            { key: 'dry', name: 'โคพักท้อง', count: 4, target: 15 },
+            { key: 'pregnantHeifers', name: 'โคสาวท้อง', count: 4, target: 15 },
+            { key: 'openHeifers', name: 'โคสาวไม่ท้อง', count: 3, target: 10 },
+            { key: 'femaleCalves', name: 'ลูกโคและโครุ่นเพศเมีย', count: 10, target: 10 },
+            { key: 'maleCalves', name: 'ลูกโคเพศผู้และโคชนิดอื่นๆ', count: 1, target: 0 }
+        ];
+
+        function initTable() {
+            const tableBody = document.getElementById('cowTable');
+            cowData.forEach(cow => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${cow.name}</td>
+                    <td><input type="number" id="${cow.key}" value="${cow.count}" min="0"></td>
+                    <td id="${cow.key}Percentage">0%</td>
+                    <td>${cow.target}%</td>
+                    <td id="${cow.key}Target">0</td>
+                    <td id="${cow.key}Difference">0</td>
+                `;
+            });
+        }
+
+        function calculate() {
+            let total = 0;
+            cowData.forEach(cow => {
+                cow.count = parseInt(document.getElementById(cow.key).value) || 0;
+                total += cow.count;
+            });
+
+            let analysisText = `<strong>จำนวนโคทั้งหมด: ${total} ตัว</strong><br><br>`;
+            let recommendationsText = '';
+
+            cowData.forEach(cow => {
+                const percentage = (cow.count / total * 100).toFixed(1);
+                const targetCount = Math.round(total * cow.target / 100);
+                const difference = targetCount - cow.count;
+
+                document.getElementById(`${cow.key}Percentage`).textContent = `${percentage}%`;
+                document.getElementById(`${cow.key}Target`).textContent = targetCount;
+                document.getElementById(`${cow.key}Difference`).textContent = difference;
+
+                analysisText += `${cow.name}: ${cow.count} ตัว (${percentage}%)<br>`;
+                
+                if (Math.abs(difference) > 1) {
+                    if (difference > 0) {
+                        recommendationsText += `- ควรเพิ่ม ${cow.name} อีก ${difference} ตัว<br>`;
+                    } else {
+                        recommendationsText += `- ควรลด ${cow.name} ลง ${Math.abs(difference)} ตัว<br>`;
+                    }
+                }
+            });
+
+            const lactatingPercentage = (cowData[0].count / total * 100).toFixed(1);
+            analysisText += `<br><strong>สัดส่วนแม่โครีดนม: ${lactatingPercentage}% (เป้าหมาย 50%)</strong><br>`;
+
+            if (Math.abs(50 - lactatingPercentage) > 5) {
+                const diffLactating = Math.round((50 - lactatingPercentage) * total / 100);
+                if (diffLactating > 0) {
+                    recommendationsText += `<strong>- ควรเพิ่มจำนวนแม่โครีดนมอีกประมาณ ${diffLactating} ตัว เพื่อให้ได้สัดส่วน 50% ของฝูง</strong><br>`;
+                } else {
+                    recommendationsText += `<strong>- ควรลดจำนวนแม่โครีดนมลงประมาณ ${Math.abs(diffLactating)} ตัว เพื่อให้ได้สัดส่วน 50% ของฝูง</strong><br>`;
+                }
+            }
+
+            document.getElementById('analysis').innerHTML = analysisText;
+            document.getElementById('recommendations').innerHTML = recommendationsText || 'ไม่มีคำแนะนำเพิ่มเติม สัดส่วนฝูงโคของคุณอยู่ในเกณฑ์ที่เหมาะสมแล้ว';
+            document.getElementById('results').style.display = 'block';
+        }
+
+        window.onload = function() {
+            initTable();
+        };
+    </script>
+</body>
+</html>
