@@ -102,6 +102,13 @@
             text-align: center;
             font-style: italic;
         }
+        .tool-description {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f7f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -147,6 +154,9 @@
                 <h3>คำแนะนำ</h3>
                 <div id="recommendations"></div>
             </div>
+        </div>
+        <div class="tool-description">
+            เครื่องคำนวณสัดส่วนฝูงโคนม ช่วยให้คุณวิเคราะห์และปรับปรุงโครงสร้างฝูงได้อย่างแม่นยำ เพียงกรอกจำนวนโคในแต่ละกลุ่ม แล้วรับผลวิเคราะห์และคำแนะนำที่ปรับให้เหมาะกับฟาร์มของคุณโดยเฉพาะ
         </div>
         <div class="contact-info">
             สำหรับข้อมูลเพิ่มเติม กรุณาติดต่อ: แผนกวิชาการโคนม ฝ่ายวิจัยและพัฒนาการเลี้ยงโคนม<br>
@@ -200,26 +210,43 @@
 
                 analysisText += `${cow.name}: ${cow.count} ตัว (${percentage}%)<br>`;
                 
-                if (Math.abs(difference) > 1) {
-                    if (difference > 0) {
-                        recommendationsText += `- ควรเพิ่ม ${cow.name} อีก ${difference} ตัว<br>`;
-                    } else {
-                        recommendationsText += `- ควรลด ${cow.name} ลง ${Math.abs(difference)} ตัว<br>`;
-                    }
+                switch(cow.key) {
+                    case 'lactating':
+                        if (percentage < 50) {
+                            recommendationsText += `จำนวนโครีดนมที่เหมาะสมของฟาร์ม คือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
+                        }
+                        break;
+                    case 'dry':
+                        if (percentage < 15) {
+                            recommendationsText += `จำนวนแม่โคพักท้องที่เหมาะสมของฟาร์ม คือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
+                        }
+                        break;
+                    case 'pregnantHeifers':
+                        if (percentage < 15) {
+                            recommendationsText += `จำนวนโคสาวท้องที่เหมาะสมคือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
+                        }
+                        break;
+                    case 'openHeifers':
+                        if (percentage < 10) {
+                            recommendationsText += `จำนวนโคสาวไม่ท้องที่เหมาะสมคือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
+                        } else if (percentage > 10) {
+                            recommendationsText += `จำนวนโคสาวไม่ท้องที่เหมาะสมคือ ${targetCount} ตัว (ควรลด ${-difference} ตัว)<br>`;
+                        }
+                        break;
+                    case 'femaleCalves':
+                        if (percentage < 10) {
+                            recommendationsText += `จำนวนลูกโคและโครุ่นเพศเมียที่เหมาะสมคือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
+                        } else if (percentage > 10) {
+                            recommendationsText += `จำนวนลูกโคและโครุ่นเพศเมียที่เหมาะสมคือ ${targetCount} ตัว (ควรลด ${-difference} ตัว)<br>`;
+                        }
+                        break;
+                    case 'maleCalves':
+                        if (cow.count > 0) {
+                            recommendationsText += `จำนวนลูกโคเพศผู้และโคชนิดอื่นๆ ไม่ควรมี (ควรลด ${cow.count} ตัว)<br>`;
+                        }
+                        break;
                 }
             });
-
-            const lactatingPercentage = (cowData[0].count / total * 100).toFixed(1);
-            analysisText += `<br><strong>สัดส่วนแม่โครีดนม: ${lactatingPercentage}% (เป้าหมาย 50%)</strong><br>`;
-
-            if (Math.abs(50 - lactatingPercentage) > 5) {
-                const diffLactating = Math.round((50 - lactatingPercentage) * total / 100);
-                if (diffLactating > 0) {
-                    recommendationsText += `<strong>- ควรเพิ่มจำนวนแม่โครีดนมอีกประมาณ ${diffLactating} ตัว เพื่อให้ได้สัดส่วน 50% ของฝูง</strong><br>`;
-                } else {
-                    recommendationsText += `<strong>- ควรลดจำนวนแม่โครีดนมลงประมาณ ${Math.abs(diffLactating)} ตัว เพื่อให้ได้สัดส่วน 50% ของฝูง</strong><br>`;
-                }
-            }
 
             document.getElementById('analysis').innerHTML = analysisText;
             document.getElementById('recommendations').innerHTML = recommendationsText || 'ไม่มีคำแนะนำเพิ่มเติม สัดส่วนฝูงโคของคุณอยู่ในเกณฑ์ที่เหมาะสมแล้ว';
