@@ -3,259 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เครื่องคำนวณสัดส่วนฝูงโคนม</title>
+    <title>แอปพลิเคชันคำนวณค่าเสื่อมโคนม</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #27ae60;
-            --background-color: #f0f2f5;
-            --card-background: #ffffff;
-            --text-color: #333333;
-        }
-        body {
-            font-family: 'Sarabun', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            background: var(--card-background);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-        .table-responsive {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            background-color: var(--card-background);
-        }
-        th, td {
-            border: 1px solid #e0e0e0;
-            padding: 12px;
-            text-align: center;
-        }
-        th {
-            background-color: var(--primary-color);
-            color: var(--card-background);
-            font-weight: bold;
-        }
-        input[type="number"] {
-            width: 80px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2ecc71;
-        }
-        #results {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #ecf0f1;
-            border-radius: 8px;
-            display: none;
-        }
-        #results h2 {
-            color: var(--primary-color);
-            margin-top: 0;
-        }
-        .recommendation {
-            background-color: #d5f5e3;
-            border-left: 5px solid var(--secondary-color);
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 4px;
-        }
-        .contact-info {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #e8f6f3;
-            border-radius: 8px;
-            text-align: center;
-            font-style: italic;
-        }
-        .tool-description {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #f7f9fa;
-            border-radius: 8px;
-            text-align: center;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 2em;
-            }
-            th, td {
-                padding: 8px;
-            }
-            input[type="number"] {
-                width: 60px;
-            }
-        }
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #2c3e50; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+        th { background-color: #f2f2f2; }
+        input { width: 100px; }
+        .blue-cell { background-color: #e6f3ff; }
+        button { padding: 10px; background-color: #3498db; color: white; border: none; cursor: pointer; margin-right: 10px; }
+        button:hover { background-color: #2980b9; }
+        .contact-info { margin-top: 20px; font-style: italic; background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
+        .app-description { margin-top: 20px; font-style: italic; background-color: #e9f7ef; padding: 15px; border-radius: 5px; color: #27ae60; }
+        .explanation { margin-top: 10px; font-style: italic; color: #666; }
+        .error { color: red; margin-top: 10px; }
+        .highlight { background-color: #fffacd; padding: 5px; border-radius: 3px; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>เครื่องคำนวณสัดส่วนฝูงโคนม</h1>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ระยะการผลิต</th>
-                        <th>จำนวน (ตัว)</th>
-                        <th>ร้อยละ (%)</th>
-                        <th>เป้าหมายมาตรฐาน (%)</th>
-                        <th>จำนวนตามเป้าหมาย (ตัว)</th>
-                        <th>ควรเพิ่ม/ลด</th>
-                    </tr>
-                </thead>
-                <tbody id="cowTable">
-                    <!-- จะถูกเติมด้วย JavaScript -->
-                </tbody>
-            </table>
-        </div>
-        <button onclick="calculate()">คำนวณและแสดงผล</button>
-        <div id="results">
-            <h2>ผลการวิเคราะห์</h2>
-            <div id="analysis"></div>
-            <div class="recommendation">
-                <h3>คำแนะนำ</h3>
-                <div id="recommendations"></div>
-            </div>
-        </div>
-        <div class="tool-description">
-            เครื่องคำนวณสัดส่วนฝูงโคนม ช่วยให้คุณวิเคราะห์และปรับปรุงโครงสร้างฝูงได้อย่างแม่นยำ เพียงกรอกจำนวนโคในแต่ละกลุ่ม แล้วรับผลวิเคราะห์และคำแนะนำที่ปรับให้เหมาะกับฟาร์มของคุณโดยเฉพาะ
-        </div>
-        <div class="contact-info">
-            สำหรับข้อมูลเพิ่มเติม กรุณาติดต่อ: แผนกวิชาการโคนม ฝ่ายวิจัยและพัฒนาการเลี้ยงโคนม<br>
-            อีเมล: <a href="mailto:dairyresearch@dpo.go.th">dairyresearch@dpo.go.th</a>
-        </div>
+    <h1>แอปพลิเคชันคำนวณค่าเสื่อมโคนม</h1>
+    <div id="inputForm">
+        <table>
+            <tr>
+                <td>ราคาโคนม/ตัว (บาท)</td>
+                <td><input type="number" id="cowPrice" class="blue-cell" value="45000" min="0"></td>
+            </tr>
+            <tr>
+                <td>มูลค่าซาก (บาท)</td>
+                <td><input type="number" id="salvageValue" class="blue-cell" value="10000" min="0"></td>
+            </tr>
+            <tr>
+                <td>อายุการให้ผลผลิต (ปี)</td>
+                <td><input type="number" id="productiveYears" class="blue-cell" value="5" max="5" min="1"></td>
+            </tr>
+            <tr>
+                <td>ปริมาณน้ำนม (กก.)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>     ท้องที่ 1</td>
+                <td><input type="number" id="milk1" class="blue-cell" value="4000" min="0"></td>
+            </tr>
+            <tr>
+                <td>     ท้องที่ 2</td>
+                <td><input type="number" id="milk2" class="blue-cell" value="4500" min="0"></td>
+            </tr>
+            <tr>
+                <td>     ท้องที่ 3</td>
+                <td><input type="number" id="milk3" class="blue-cell" value="5000" min="0"></td>
+            </tr>
+            <tr>
+                <td>     ท้องที่ 4</td>
+                <td><input type="number" id="milk4" class="blue-cell" value="5500" min="0"></td>
+            </tr>
+            <tr>
+                <td>     ท้องที่ 5</td>
+                <td><input type="number" id="milk5" class="blue-cell" value="6000" min="0"></td>
+            </tr>
+        </table>
+
+        <button onclick="calculateDepreciation()">คำนวณค่าเสื่อม</button>
+        <button onclick="resetForm()">รีเซ็ตข้อมูล</button>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="result"></div>
+    <canvas id="depreciationChart"></canvas>
+
+    <div class="app-description">
+        <p>แอปพลิเคชันคำนวณค่าเสื่อมโคนม - เครื่องมือทันสมัยสำหรับเกษตรกรยุคใหม่ ช่วยคุณวางแผนการเงินและจัดการฟาร์มอย่างมืออาชีพ ง่ายต่อการใช้งาน แม่นยำ และให้ผลลัพธ์ที่คุณเชื่อถือได้</p>
+    </div>
+
+    <div class="contact-info">
+        <p>สำหรับข้อมูลเพิ่มเติม กรุณาติดต่อ:</p>
+        <p>แผนกวิชาการโคนม ฝ่ายวิจัยและพัฒนาการเลี้ยงโคนม</p>
+        <p>อีเมล: dairyresearch@dpo.go.th</p>
     </div>
 
     <script>
-        const cowData = [
-            { key: 'lactating', name: 'แม่โครีดนม (ทุกระยะ)', count: 15, target: 50 },
-            { key: 'dry', name: 'โคพักท้อง', count: 4, target: 15 },
-            { key: 'pregnantHeifers', name: 'โคสาวท้อง', count: 4, target: 15 },
-            { key: 'openHeifers', name: 'โคสาวไม่ท้อง', count: 3, target: 10 },
-            { key: 'femaleCalves', name: 'ลูกโคและโครุ่นเพศเมีย', count: 10, target: 10 },
-            { key: 'maleCalves', name: 'ลูกโคเพศผู้และโคชนิดอื่นๆ', count: 1, target: 0 }
-        ];
+    function calculateDepreciation() {
+        const cowPrice = parseFloat(document.getElementById('cowPrice').value);
+        const salvageValue = parseFloat(document.getElementById('salvageValue').value);
+        const productiveYears = Math.min(parseInt(document.getElementById('productiveYears').value), 5);
+        const milkProduction = [
+            parseFloat(document.getElementById('milk1').value),
+            parseFloat(document.getElementById('milk2').value),
+            parseFloat(document.getElementById('milk3').value),
+            parseFloat(document.getElementById('milk4').value),
+            parseFloat(document.getElementById('milk5').value)
+        ].slice(0, productiveYears);
 
-        function initTable() {
-            const tableBody = document.getElementById('cowTable');
-            cowData.forEach(cow => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${cow.name}</td>
-                    <td><input type="number" id="${cow.key}" value="${cow.count}" min="0"></td>
-                    <td id="${cow.key}Percentage">0%</td>
-                    <td>${cow.target}%</td>
-                    <td id="${cow.key}Target">0</td>
-                    <td id="${cow.key}Difference">0</td>
-                `;
-            });
+        // Validate input
+        if (cowPrice <= 0 || salvageValue < 0 || productiveYears <= 0 || milkProduction.some(m => m < 0)) {
+            document.getElementById('error').textContent = "กรุณาตรวจสอบข้อมูลที่ป้อน ค่าต้องไม่ติดลบและราคาโคนมต้องมากกว่า 0";
+            return;
         }
 
-        function calculate() {
-            let total = 0;
-            cowData.forEach(cow => {
-                cow.count = parseInt(document.getElementById(cow.key).value) || 0;
-                total += cow.count;
-            });
+        if (salvageValue >= cowPrice) {
+            document.getElementById('error').textContent = "มูลค่าซากต้องน้อยกว่าราคาโคนม";
+            return;
+        }
 
-            let analysisText = `<strong>จำนวนโคทั้งหมด: ${total} ตัว</strong><br><br>`;
-            let recommendationsText = '';
+        document.getElementById('error').textContent = ""; // Clear any previous error
 
-            cowData.forEach(cow => {
-                const percentage = (cow.count / total * 100).toFixed(1);
-                const targetCount = Math.round(total * cow.target / 100);
-                const difference = targetCount - cow.count;
+        const straightLineDepreciation = (cowPrice - salvageValue) / productiveYears;
+        const totalMilk = milkProduction.reduce((a, b) => a + b, 0);
 
-                document.getElementById(`${cow.key}Percentage`).textContent = `${percentage}%`;
-                document.getElementById(`${cow.key}Target`).textContent = targetCount;
-                document.getElementById(`${cow.key}Difference`).textContent = difference;
+        let resultHTML = '<h2>ผลการคำนวณ</h2>';
+        
+        // วิธีเส้นตรง
+        resultHTML += '<h3>ค่าเสื่อมแบบเส้นตรง</h3>';
+        resultHTML += '<p class="explanation">วิธีนี้คำนวณค่าเสื่อมเท่ากันทุกปี</p>';
+        resultHTML += '<table><tr><th>ท้องที่</th><th>ค่าเสื่อม (บาท)</th><th>มูลค่าคงเหลือ (บาท)</th><th>ค่าเสื่อม/กก. (บาท)</th></tr>';
 
-                analysisText += `${cow.name}: ${cow.count} ตัว (${percentage}%)<br>`;
-                
-                switch(cow.key) {
-                    case 'lactating':
-                        if (percentage < 50) {
-                            recommendationsText += `จำนวนโครีดนมที่เหมาะสมของฟาร์ม คือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
+        // สร้างข้อมูลสำหรับกราฟ
+        const labels = Array.from({length: productiveYears + 1}, (_, i) => `ท้องที่ ${i}`);
+        const straightLineData = [cowPrice];
+        const productionBasedData = [cowPrice];
+
+        let remainingStraightLine = cowPrice;
+        let totalStraightLineDepreciation = 0;
+        for (let i = 0; i <= productiveYears; i++) {
+            let depreciation = i === 0 ? 0 : straightLineDepreciation;
+            let depreciationPerKg = i === 0 ? 0 : depreciation / milkProduction[i-1];
+            resultHTML += `<tr><td>${i}</td><td>${depreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingStraightLine.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${depreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
+            remainingStraightLine -= depreciation;
+            straightLineData.push(remainingStraightLine);
+            if (i > 0) totalStraightLineDepreciation += depreciation;
+        }
+        resultHTML += '</table>';
+        let avgStraightLineDepreciationPerKg = totalStraightLineDepreciation / totalMilk;
+        resultHTML += `<p class="highlight">ค่าเสื่อมเฉลี่ยต่อกิโลกรัมน้ำนม (วิธีเส้นตรง): ${avgStraightLineDepreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})} บาท</p>`;
+
+        // วิธีตามปริมาณผลผลิต
+        resultHTML += '<h3>ค่าเสื่อมตามปริมาณผลผลิตนม</h3>';
+        resultHTML += '<p class="explanation">วิธีนี้คำนวณค่าเสื่อมตามสัดส่วนของปริมาณน้ำนมที่ผลิตได้ในแต่ละปี</p>';
+        resultHTML += '<table><tr><th>ท้องที่</th><th>ค่าเสื่อม (บาท)</th><th>มูลค่าคงเหลือ (บาท)</th><th>ค่าเสื่อม/กก. (บาท)</th></tr>';
+        let remainingProductionBased = cowPrice;
+        let totalProductionBasedDepreciation = 0;
+        for (let i = 0; i <= productiveYears; i++) {
+            let productionBasedDepreciation;
+            let depreciationPerKg;
+            if (i === 0) {
+                productionBasedDepreciation = 0;
+                depreciationPerKg = 0;
+            } else if (i === 1) {
+                productionBasedDepreciation = Math.round((cowPrice - salvageValue) * milkProduction[i-1] / totalMilk);
+                depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
+                remainingProductionBased = cowPrice; // ยังไม่หักค่าเสื่อมในปีแรก
+            } else if (i === productiveYears) {
+                productionBasedDepreciation = remainingProductionBased - salvageValue;
+                depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
+            } else {
+                productionBasedDepreciation = Math.round((cowPrice - salvageValue) * milkProduction[i-1] / totalMilk);
+                depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
+            }
+            resultHTML += `<tr><td>${i}</td><td>${productionBasedDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingProductionBased.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${depreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
+            if (i > 0) {
+                remainingProductionBased -= productionBasedDepreciation;
+                totalProductionBasedDepreciation += productionBasedDepreciation;
+            }
+            productionBasedData.push(remainingProductionBased);
+        }
+        resultHTML += '</table>';
+        let avgProductionBasedDepreciationPerKg = totalProductionBasedDepreciation / totalMilk;
+        resultHTML += `<p class="highlight">ค่าเสื่อมเฉลี่ยต่อกิโลกรัมน้ำนม (วิธีตามปริมาณผลผลิต): ${avgProductionBasedDepreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})} บาท</p>`;
+
+        document.getElementById('result').innerHTML = resultHTML;
+
+        // สร้างกราฟ
+        const ctx = document.getElementById('depreciationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'ค่าเสื่อมแบบเส้นตรง',
+                    data: straightLineData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }, {
+                    label: 'ค่าเสื่อมตามปริมาณผลผลิต',
+                    data: productionBasedData,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'มูลค่าคงเหลือ (บาท)'
                         }
-                        break;
-                    case 'dry':
-                        if (percentage < 15) {
-                            recommendationsText += `จำนวนแม่โคพักท้องที่เหมาะสมของฟาร์ม คือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'ท้องที่'
                         }
-                        break;
-                    case 'pregnantHeifers':
-                        if (percentage < 15) {
-                            recommendationsText += `จำนวนโคสาวท้องที่เหมาะสมคือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
-                        }
-                        break;
-                    case 'openHeifers':
-                        if (percentage < 10) {
-                            recommendationsText += `จำนวนโคสาวไม่ท้องที่เหมาะสมคือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
-                        } else if (percentage > 10) {
-                            recommendationsText += `จำนวนโคสาวไม่ท้องที่เหมาะสมคือ ${targetCount} ตัว (ควรลด ${-difference} ตัว)<br>`;
-                        }
-                        break;
-                    case 'femaleCalves':
-                        if (percentage < 10) {
-                            recommendationsText += `จำนวนลูกโคและโครุ่นเพศเมียที่เหมาะสมคือ ${targetCount} ตัว (ควรเพิ่ม ${difference} ตัว)<br>`;
-                        } else if (percentage > 10) {
-                            recommendationsText += `จำนวนลูกโคและโครุ่นเพศเมียที่เหมาะสมคือ ${targetCount} ตัว (ควรลด ${-difference} ตัว)<br>`;
-                        }
-                        break;
-                    case 'maleCalves':
-                        if (cow.count > 0) {
-                            recommendationsText += `จำนวนลูกโคเพศผู้และโคชนิดอื่นๆ ไม่ควรมี (ควรลด ${cow.count} ตัว)<br>`;
-                        }
-                        break;
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `การเปรียบเทียบค่าเสื่อม ${productiveYears} ปี`
+                    }
                 }
-            });
+            }
+        });
 
-            document.getElementById('analysis').innerHTML = analysisText;
-            document.getElementById('recommendations').innerHTML = recommendationsText || 'ไม่มีคำแนะนำเพิ่มเติม สัดส่วนฝูงโคของคุณอยู่ในเกณฑ์ที่เหมาะสมแล้ว';
-            document.getElementById('results').style.display = 'block';
-        }
+        console.log(`จำนวนปีที่แสดง: ${productiveYears}`);
+        console.log('ข้อมูลแบบเส้นตรง:', straightLineData);
+        console.log('ข้อมูลตามปริมาณผลผลิต:', productionBasedData);
+    }
 
-        window.onload = function() {
-            initTable();
-        };
+    function resetForm() {
+        document.getElementById('cowPrice').value = "45000";
+        document.getElementById('salvageValue').value = "10000";
+        document.getElementById('productiveYears').value = "5";
+        document.getElementById('milk1').value = "4000";
+        document.getElementById('milk2').value = "4500";
+        document.getElementById('milk3').value = "5000";
+        document.getElementById('milk4').value = "5500";
+        document.getElementById('milk5').value = "6000";
+        document.getElementById('error').textContent = "";
+        document.getElementById('result').innerHTML = "";
+        document.getElementById('depreciationChart').innerHTML = "";
+    }
     </script>
 </body>
 </html>
