@@ -148,36 +148,21 @@ const depreciationPerKg = (cowPrice - salvageValue) / totalMilk;
 
 for (let i = 0; i <= productiveYears; i++) {
     let productionBasedDepreciation;
-    let currentDepreciationPerKg = depreciationPerKg;
     
     if (i === 0) {
         productionBasedDepreciation = 0;
     } else if (i === productiveYears) {
         productionBasedDepreciation = remainingProductionBased - salvageValue;
-        currentDepreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
     } else {
         productionBasedDepreciation = Math.round(depreciationPerKg * milkProduction[i-1]);
     }
 
-    resultHTML += `<tr><td>${i}</td><td>${productionBasedDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingProductionBased.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${currentDepreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
+    resultHTML += `<tr><td>${i}</td><td>${productionBasedDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingProductionBased.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${depreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
     
-    if (i > 0) {
-        remainingProductionBased -= productionBasedDepreciation;
-        totalProductionBasedDepreciation += productionBasedDepreciation;
-    }
+    remainingProductionBased -= productionBasedDepreciation;
+    totalProductionBasedDepreciation += productionBasedDepreciation;
     
     productionBasedData.push(remainingProductionBased);
-}
-
-// ปรับแก้ค่าในปีสุดท้าย
-if (remainingProductionBased !== salvageValue) {
-    let lastYearIndex = productiveYears;
-    let lastYearDepreciation = productionBasedData[lastYearIndex - 1] - salvageValue;
-    resultHTML = resultHTML.replace(
-        `<tr><td>${lastYearIndex}</td><td>${productionBasedData[lastYearIndex - 1] - productionBasedData[lastYearIndex]}</td><td>${productionBasedData[lastYearIndex]}</td>`,
-        `<tr><td>${lastYearIndex}</td><td>${lastYearDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${salvageValue.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td>`
-    );
-    productionBasedData[lastYearIndex] = salvageValue;
 }
 
 resultHTML += '</table>';
