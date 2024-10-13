@@ -138,38 +138,38 @@
         resultHTML += `<p class="highlight">ค่าเสื่อมเฉลี่ยต่อกิโลกรัมน้ำนม (วิธีเส้นตรง): ${avgStraightLineDepreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})} บาท</p>`;
 
         // วิธีตามปริมาณผลผลิต
-        resultHTML += '<h3>ค่าเสื่อมตามปริมาณผลผลิตนม</h3>';
-        resultHTML += '<p class="explanation">วิธีนี้คำนวณค่าเสื่อมตามสัดส่วนของปริมาณน้ำนมที่ผลิตได้ในแต่ละปี</p>';
-        resultHTML += '<table><tr><th>ท้องที่</th><th>ค่าเสื่อม (บาท)</th><th>มูลค่าคงเหลือ (บาท)</th><th>ค่าเสื่อม/กก. (บาท)</th></tr>';
-        let remainingProductionBased = cowPrice;
-        let totalProductionBasedDepreciation = 0;
-        for (let i = 0; i <= productiveYears; i++) {
-            let productionBasedDepreciation;
-            let depreciationPerKg;
-            if (i === 0) {
-                productionBasedDepreciation = 0;
-                depreciationPerKg = 0;
-            } else if (i === 1) {
-                productionBasedDepreciation = Math.round((cowPrice - salvageValue) * milkProduction[i-1] / totalMilk);
-                depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
-                remainingProductionBased = cowPrice; // ยังไม่หักค่าเสื่อมในปีแรก
-            } else if (i === productiveYears) {
-                productionBasedDepreciation = remainingProductionBased - salvageValue;
-                depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
-            } else {
-                productionBasedDepreciation = Math.round((cowPrice - salvageValue) * milkProduction[i-1] / totalMilk);
-                depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
-            }
-            resultHTML += `<tr><td>${i}</td><td>${productionBasedDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingProductionBased.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${depreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
-            if (i > 0) {
-                remainingProductionBased -= productionBasedDepreciation;
-                totalProductionBasedDepreciation += productionBasedDepreciation;
-            }
-            productionBasedData.push(remainingProductionBased);
-        }
-        resultHTML += '</table>';
-        let avgProductionBasedDepreciationPerKg = totalProductionBasedDepreciation / totalMilk;
-        resultHTML += `<p class="highlight">ค่าเสื่อมเฉลี่ยต่อกิโลกรัมน้ำนม (วิธีตามปริมาณผลผลิต): ${avgProductionBasedDepreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})} บาท</p>`;
+resultHTML += '<h3>ค่าเสื่อมตามปริมาณผลผลิตนม</h3>';
+resultHTML += '<p class="explanation">วิธีนี้คำนวณค่าเสื่อมตามสัดส่วนของปริมาณน้ำนมที่ผลิตได้ในแต่ละปี</p>';
+resultHTML += '<table><tr><th>ท้องที่</th><th>ค่าเสื่อม (บาท)</th><th>มูลค่าคงเหลือ (บาท)</th><th>ค่าเสื่อม/กก. (บาท)</th></tr>';
+let remainingProductionBased = cowPrice;
+let totalProductionBasedDepreciation = 0;
+for (let i = 0; i <= productiveYears; i++) {
+    let productionBasedDepreciation;
+    let depreciationPerKg;
+    if (i === 0) {
+        productionBasedDepreciation = 0;
+        depreciationPerKg = 0;
+    } else if (i === 1) {
+        productionBasedDepreciation = Math.round((cowPrice - salvageValue) * milkProduction[i-1] / totalMilk);
+        depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
+        remainingProductionBased = cowPrice; // ยังไม่หักค่าเสื่อมในปีแรก
+    } else if (i === productiveYears) {
+        productionBasedDepreciation = remainingProductionBased - salvageValue;
+        depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
+    } else {
+        productionBasedDepreciation = Math.round((cowPrice - salvageValue) * milkProduction[i-1] / totalMilk);
+        depreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
+    }
+    resultHTML += `<tr><td>${i}</td><td>${productionBasedDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingProductionBased.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${depreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
+    if (i > 0) {
+        remainingProductionBased -= productionBasedDepreciation;
+        totalProductionBasedDepreciation += productionBasedDepreciation;
+    }
+    productionBasedData.push(remainingProductionBased);
+}
+resultHTML += '</table>';
+let avgProductionBasedDepreciationPerKg = totalProductionBasedDepreciation / totalMilk;
+resultHTML += `<p class="highlight">ค่าเสื่อมเฉลี่ยต่อกิโลกรัมน้ำนม (วิธีตามปริมาณผลผลิต): ${avgProductionBasedDepreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})} บาท</p>`;
 
         document.getElementById('result').innerHTML = resultHTML;
 
