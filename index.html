@@ -148,16 +148,18 @@ const depreciationPerKg = (cowPrice - salvageValue) / totalMilk;
 
 for (let i = 0; i <= productiveYears; i++) {
     let productionBasedDepreciation;
+    let currentDepreciationPerKg = depreciationPerKg;
     
     if (i === 0) {
         productionBasedDepreciation = 0;
     } else if (i === productiveYears) {
         productionBasedDepreciation = remainingProductionBased - salvageValue;
+        currentDepreciationPerKg = productionBasedDepreciation / milkProduction[i-1];
     } else {
         productionBasedDepreciation = Math.round(depreciationPerKg * milkProduction[i-1]);
     }
 
-    resultHTML += `<tr><td>${i}</td><td>${productionBasedDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingProductionBased.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${depreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
+    resultHTML += `<tr><td>${i}</td><td>${productionBasedDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${remainingProductionBased.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${currentDepreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})}</td></tr>`;
     
     if (i > 0) {
         remainingProductionBased -= productionBasedDepreciation;
