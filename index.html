@@ -169,6 +169,17 @@ for (let i = 0; i <= productiveYears; i++) {
     productionBasedData.push(remainingProductionBased);
 }
 
+// ปรับแก้ค่าในปีสุดท้าย
+if (remainingProductionBased !== salvageValue) {
+    let lastYearIndex = productiveYears;
+    let lastYearDepreciation = productionBasedData[lastYearIndex - 1] - salvageValue;
+    resultHTML = resultHTML.replace(
+        `<tr><td>${lastYearIndex}</td><td>${productionBasedData[lastYearIndex - 1] - productionBasedData[lastYearIndex]}</td><td>${productionBasedData[lastYearIndex]}</td>`,
+        `<tr><td>${lastYearIndex}</td><td>${lastYearDepreciation.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td><td>${salvageValue.toLocaleString('th-TH', {maximumFractionDigits: 0})}</td>`
+    );
+    productionBasedData[lastYearIndex] = salvageValue;
+}
+
 resultHTML += '</table>';
 resultHTML += `<p class="highlight">ค่าเสื่อมเฉลี่ยต่อกิโลกรัมน้ำนม (วิธีตามปริมาณผลผลิต): ${depreciationPerKg.toLocaleString('th-TH', {maximumFractionDigits: 2})} บาท</p>`;
 
